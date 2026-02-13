@@ -11,7 +11,7 @@
 
 🕓 Date - 2026-02-13
 
-🔍 Technologies Used - Html , Css , Javascript
+🔍 Technologies Used - Javascript, Html , Css ,
 
 👨‍💻 project master: [Parsa Ghorbanian](https://www.instagram.com/parsa_ghorbanian_web?igsh=MXQydDAxMW05ZjgyYg%3D%3D)
 
