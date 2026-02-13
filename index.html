@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Mouse Interaction</title>
+
+    <style>
+        body {
+            min-height: 100vh;
+            background: radial-gradient(circle at top, #222, #000);
+            cursor: none;
+            overflow: hidden;
+        }
+
+        .cursor-big {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            position: absolute;
+            transform: translate(-50%, -50%);
+            background: conic-gradient(from 0deg, red, magenta, cyan, red);
+            transition: filter .2s;
+
+            &::after {
+                content: '';
+                position: absolute;
+                inset: 3px;
+                background: #000;
+                border-radius: 50%;
+            }
+        }
+
+        .cursor-small {
+            width: 8px;
+            height: 8px;
+            background: white;
+            border-radius: 50%;
+            position: absolute;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+        }
+
+        .trail {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            pointer-events: none;
+            opacity: .6;
+            animation: trailFade .5s linear forwards;
+        }
+
+        @keyframes trailFade {
+            to {
+                transform: scale(2);
+                opacity: 0;
+            }
+        }
+
+        .ripple {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            border: 2px solid;
+            transform: translate(-50%, -50%) scale(0);
+            animation: ripple .7s ease-out forwards;
+        }
+
+        @keyframes ripple {
+            to {
+                transform: translate(-50%, -50%) scale(8);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="cursor-big"></div>
+    <div class="cursor-small"></div>
+
+    <script>
+        const big = document.querySelector('.cursor-big')
+        const small = document.querySelector('.cursor-small')
+
+        let x = 0
+        let y = 0
+        let lastX = 0
+        let lastY = 0
+        let bigX = 0
+        let bigY = 0
+        let hue = 0
+        let angle = 0
+
+        window.addEventListener('mousemove', (e) => {
+
+            x = e.clientX
+            y = e.clientY
+
+            small.style.left = x + 'px'
+            small.style.top = y + 'px'
+
+            let dx = x - lastX
+            let dy = y - lastY
+            let speed = Math.sqrt(dx * dx + dy * dy)
+
+            hue += speed
+            if (hue > 360) {
+                hue = 0
+            }
+
+            angle += speed / 2
+            if (angle > 360) {
+                angle = 0
+            }
+
+            let color1 = 'hsl(' + hue + ',90%,60%)'
+            let color2 = 'hsl(' + (hue + 120) + ',90%,60%)'
+
+            big.style.background =
+                'conic-gradient(from ' + angle + 'deg,' + color1 + ',' + color2 + ',' + color1 + ')'
+
+            big.style.filter = 'drop-shadow(0 0 ' + (10 + speed) + 'px ' + color1 + ')'
+
+
+            if (speed > 8) {
+                let t = document.createElement('div')
+                t.classList.add('trail')
+                t.style.left = x + 'px'
+                t.style.top = y + 'px'
+                t.style.background = color1
+                document.body.appendChild(t)
+
+                setTimeout(function () {
+                    t.remove()
+                }, 500)
+            }
+
+            lastX = x
+            lastY = y
+        })
+
+
+        setInterval(function () {
+
+            bigX = bigX + (x - bigX) * 0.2
+            bigY = bigY + (y - bigY) * 0.2
+
+            big.style.left = bigX + 'px'
+            big.style.top = bigY + 'px'
+
+        }, 16)
+
+        window.addEventListener('mousedown', function () {
+
+            for (let i = 0; i < 2; i++) {
+
+                let r = document.createElement('div')
+                r.classList.add('ripple')
+                r.style.left = x + 'px'
+                r.style.top = y + 'px'
+                r.style.borderColor = 'hsl(' + (hue + i * 60) + ',90%,60%)'
+
+                if (i == 0) {
+                    r.style.animationDuration = '.5s'
+                } else {
+                    r.style.animationDuration = '.8s'
+                }
+
+                document.body.appendChild(r)
+
+                setTimeout(function () {
+                    r.remove()
+                }, 800)
+            }
+        })
+    </script>
+
+
+</body>
+
+</html>
